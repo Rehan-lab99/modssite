@@ -1,3 +1,6 @@
+/* ============================================================
+   MODSCOM - WHITE THEME
+   ============================================================ */
 * {
     margin: 0;
     padding: 0;
@@ -5,17 +8,17 @@
 }
 
 :root {
-    --primary: #0d1117;
-    --secondary: #161b22;
+    --primary: #ffffff;
+    --secondary: #f8f9fa;
     --accent: #2ea043;
     --accent-hover: #238636;
-    --bg: #0d1117;
-    --card-bg: #161b22;
-    --card-hover: #1c2333;
-    --text: #f0f6fc;
-    --text-muted: #8b949e;
-    --border: #30363d;
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --bg: #ffffff;
+    --card-bg: #ffffff;
+    --card-hover: #f0f0f0;
+    --text: #000000;
+    --text-muted: #555555;
+    --border: #e0e0e0;
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     --radius: 12px;
 }
 
@@ -28,7 +31,7 @@ body {
 
 a {
     text-decoration: none;
-    color: inherit;
+    color: var(--text);
 }
 
 .container {
@@ -63,7 +66,7 @@ header {
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
 }
 
 header .container {
@@ -89,6 +92,7 @@ header .container {
     font-size: 1.6rem;
     font-weight: 800;
     letter-spacing: -0.5px;
+    color: var(--text);
 }
 
 .logo h1 span {
@@ -115,8 +119,8 @@ header .container {
     padding: 10px 18px;
     border: none;
     border-radius: 30px;
-    background: rgba(255, 255, 255, 0.06);
-    color: #fff;
+    background: #f0f0f0;
+    color: var(--text);
     outline: 2px solid transparent;
     transition: 0.3s;
     min-width: 220px;
@@ -130,7 +134,7 @@ header .container {
 
 .header-search input:focus {
     outline-color: var(--accent);
-    background: rgba(255, 255, 255, 0.1);
+    background: #ffffff;
 }
 
 .header-search .search-btn {
@@ -157,7 +161,7 @@ header .container {
     font-size: 0.7rem;
     color: #22c55e;
     font-weight: 600;
-    background: rgba(34, 197, 94, 0.15);
+    background: rgba(34, 197, 94, 0.1);
     padding: 4px 14px;
     border-radius: 30px;
     border: 1px solid rgba(34, 197, 94, 0.3);
@@ -176,7 +180,7 @@ header .container {
 
 /* CATEGORY BAR */
 .category-bar {
-    background: var(--card-bg);
+    background: var(--secondary);
     padding: 12px 0;
     border-bottom: 1px solid var(--border);
     position: sticky;
@@ -205,8 +209,8 @@ header .container {
 }
 
 .cat-tab:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+    background: #e8e8e8;
+    color: var(--text);
     border-color: var(--accent);
 }
 
@@ -222,7 +226,7 @@ header .container {
 
 /* STATS BAR - ADMIN ONLY */
 .stats-bar {
-    background: var(--card-bg);
+    background: var(--secondary);
     padding: 10px 0;
     border-bottom: 1px solid var(--border);
 }
@@ -243,7 +247,7 @@ header .container {
     color: var(--accent);
 }
 .stats-bar .stat-item strong {
-    color: #fff;
+    color: var(--text);
 }
 
 /* APK GRID */
@@ -260,6 +264,7 @@ header .container {
     display: flex;
     align-items: center;
     gap: 10px;
+    color: var(--text);
 }
 
 .section-title h2 i {
@@ -289,12 +294,13 @@ header .container {
     display: flex;
     gap: 14px;
     align-items: center;
+    box-shadow: var(--shadow);
 }
 
 .apk-card:hover {
     transform: translateY(-4px);
     border-color: var(--accent);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
     background: var(--card-hover);
 }
 
@@ -335,6 +341,7 @@ header .container {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: var(--text);
 }
 
 .apk-info .meta {
@@ -346,7 +353,7 @@ header .container {
 }
 
 .apk-info .meta span {
-    background: rgba(255, 255, 255, 0.05);
+    background: #f0f0f0;
     padding: 2px 10px;
     border-radius: 30px;
 }
@@ -368,7 +375,7 @@ header .container {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.92);
+    background: rgba(0, 0, 0, 0.6);
     z-index: 999;
     display: none;
     align-items: center;
@@ -387,7 +394,7 @@ header .container {
     width: 100%;
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
     animation: slideUp 0.35s ease;
     max-height: 95vh;
     overflow-y: auto;
@@ -413,8 +420,8 @@ header .container {
     position: absolute;
     top: 12px;
     right: 16px;
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--text);
     border: none;
     border-radius: 50%;
     width: 38px;
@@ -429,6 +436,7 @@ header .container {
 
 .detail-close:hover {
     background: #ef4444;
+    color: #fff;
     transform: rotate(90deg);
 }
 
@@ -466,6 +474,7 @@ header .container {
     font-size: 1.4rem;
     font-weight: 800;
     margin-bottom: 4px;
+    color: var(--text);
 }
 
 .detail-meta {
@@ -477,7 +486,7 @@ header .container {
 }
 
 .detail-meta span {
-    background: rgba(255, 255, 255, 0.05);
+    background: #f0f0f0;
     padding: 3px 12px;
     border-radius: 30px;
     border: 1px solid var(--border);
@@ -508,16 +517,16 @@ header .container {
 .detail-desc {
     font-size: 0.95rem;
     line-height: 1.8;
-    color: #b0c4de;
+    color: var(--text);
     margin-bottom: 20px;
     padding: 16px 20px;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--secondary);
     border-radius: 10px;
     border-left: 3px solid var(--accent);
 }
 
 .download-section {
-    margin: 16px 0 20px;
+    margin: 16px 0 12px;
     text-align: center;
 }
 
@@ -548,6 +557,29 @@ header .container {
     opacity: 0.7;
 }
 
+/* TELEGRAM CONTACT */
+.telegram-contact {
+    text-align: center;
+    margin: 12px 0 20px;
+    padding: 12px;
+    background: #e8f5e9;
+    border-radius: 10px;
+}
+
+.telegram-contact a {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.telegram-contact a:hover {
+    text-decoration: underline;
+}
+
+.telegram-contact i {
+    margin-right: 8px;
+}
+
 /* COMMENTS SECTION */
 .comments-section {
     margin-top: 22px;
@@ -570,6 +602,7 @@ header .container {
     display: flex;
     align-items: center;
     gap: 10px;
+    color: var(--text);
 }
 
 .comments-section .comments-header h4 i {
@@ -579,7 +612,7 @@ header .container {
 .comments-section .comments-header .live-badge {
     font-size: 0.65rem;
     color: #22c55e;
-    background: rgba(34, 197, 94, 0.15);
+    background: rgba(34, 197, 94, 0.1);
     padding: 2px 12px;
     border-radius: 30px;
     border: 1px solid rgba(34, 197, 94, 0.2);
@@ -592,7 +625,7 @@ header .container {
 }
 
 .comment-item {
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--secondary);
     padding: 10px 14px;
     border-radius: 10px;
     margin-bottom: 8px;
@@ -612,6 +645,7 @@ header .container {
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
+    color: var(--text);
 }
 
 .comment-item .comment-user i {
@@ -626,7 +660,7 @@ header .container {
 
 .comment-item .comment-text {
     font-size: 0.85rem;
-    color: #c8d6e5;
+    color: var(--text);
     margin-top: 3px;
 }
 
@@ -643,8 +677,8 @@ header .container {
     border: 1px solid var(--border);
     border-radius: 10px;
     font-size: 0.85rem;
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+    background: var(--bg);
+    color: var(--text);
     transition: 0.3s;
 }
 
@@ -655,7 +689,7 @@ header .container {
 .comment-input-group input:focus {
     outline: none;
     border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(46, 160, 67, 0.1);
 }
 
 .comment-input-group .btn-comment {
@@ -725,7 +759,7 @@ header .container {
     border-color: var(--border);
 }
 .btn-close-detail:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.05);
 }
 
 /* ADMIN PANEL */
@@ -736,6 +770,7 @@ header .container {
     border-radius: 16px;
     margin: 30px 0;
     border: 1px solid var(--border);
+    box-shadow: var(--shadow);
 }
 
 #secretAdminPanel.visible {
@@ -759,6 +794,7 @@ header .container {
     display: flex;
     align-items: center;
     gap: 10px;
+    color: var(--text);
 }
 
 #secretAdminPanel .admin-header h2 i {
@@ -772,7 +808,7 @@ header .container {
     margin-bottom: 20px;
 }
 .admin-dash-card {
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--secondary);
     padding: 12px;
     border-radius: 10px;
     border: 1px solid var(--border);
@@ -815,8 +851,8 @@ header .container {
     font-family: inherit;
     font-size: 0.9rem;
     transition: 0.3s;
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+    background: var(--bg);
+    color: var(--text);
 }
 
 .form-group input::placeholder,
@@ -829,25 +865,19 @@ header .container {
 .form-group textarea:focus {
     outline: none;
     border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(46, 160, 67, 0.1);
 }
 
 .form-group input[type="file"] {
     padding: 10px;
     border: 2px dashed var(--border);
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--secondary);
 }
 
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
-}
-
-.form-row-3 {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 14px;
 }
 
 .form-actions {
@@ -912,8 +942,8 @@ header .container {
     color: var(--text-muted);
 }
 .btn-outline:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+    background: var(--secondary);
+    color: var(--text);
 }
 
 /* ADMIN LOGIN */
@@ -924,7 +954,7 @@ header .container {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.95);
+    background: rgba(0, 0, 0, 0.8);
     z-index: 9999;
     align-items: center;
     justify-content: center;
@@ -956,6 +986,7 @@ header .container {
 .admin-login-box h2 {
     font-size: 1.4rem;
     font-weight: 800;
+    color: var(--text);
 }
 
 .admin-login-box p {
@@ -972,8 +1003,8 @@ header .container {
     font-size: 0.95rem;
     margin-bottom: 14px;
     transition: 0.3s;
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+    background: var(--bg);
+    color: var(--text);
 }
 
 .admin-login-box input:focus {
@@ -1012,7 +1043,7 @@ header .container {
 .empty-state h3 {
     font-size: 1.3rem;
     margin-bottom: 6px;
-    color: #fff;
+    color: var(--text);
 }
 
 /* FOOTER */
@@ -1024,7 +1055,7 @@ footer {
     border-top: 2px solid var(--accent);
 }
 
-footer .container {
+footer .container .footer-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1102,6 +1133,11 @@ footer .footer-copy i {
 
     .stats-bar .container {
         gap: 15px;
+    }
+
+    footer .container .footer-content {
+        flex-direction: column;
+        text-align: center;
     }
 }
 
