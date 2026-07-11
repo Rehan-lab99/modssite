@@ -51,14 +51,62 @@
             </div>
         </header>
 
-        <!-- CATEGORY BAR -->
-        <div class="category-bar">
-            <div class="container" id="categoryList">
-                <span class="cat-tab active" data-cat="all"><i class="fas fa-fire"></i> All</span>
-                <span class="cat-tab" data-cat="apps"><i class="fas fa-cube"></i> Apps</span>
-                <span class="cat-tab" data-cat="games"><i class="fas fa-gamepad"></i> Games</span>
-                <span class="cat-tab" data-cat="mods"><i class="fas fa-wrench"></i> Mods</span>
-                <span class="cat-tab" data-cat="tools"><i class="fas fa-tools"></i> Tools</span>
+        <!-- ========================================================== -->
+        <!-- ALL CATEGORIES - COMPLETE LIST -->
+        <!-- ========================================================== -->
+        <div class="category-section">
+            <div class="container">
+                <div class="category-grid" id="categoryGrid">
+                    <span class="cat-tab active" data-cat="all"><i class="fas fa-fire"></i> All</span>
+                    <span class="cat-tab" data-cat="art-design"><i class="fas fa-palette"></i> Art & Design</span>
+                    <span class="cat-tab" data-cat="auto-vehicles"><i class="fas fa-car"></i> Auto & Vehicles</span>
+                    <span class="cat-tab" data-cat="beauty"><i class="fas fa-spa"></i> Beauty</span>
+                    <span class="cat-tab" data-cat="books-reference"><i class="fas fa-book"></i> Books & Reference</span>
+                    <span class="cat-tab" data-cat="business"><i class="fas fa-briefcase"></i> Business</span>
+                    <span class="cat-tab" data-cat="comics"><i class="fas fa-comic-book"></i> Comics</span>
+                    <span class="cat-tab" data-cat="communication"><i class="fas fa-comments"></i> Communication</span>
+                    <span class="cat-tab" data-cat="dating"><i class="fas fa-heart"></i> Dating</span>
+                    <span class="cat-tab" data-cat="education"><i class="fas fa-graduation-cap"></i> Education</span>
+                    <span class="cat-tab" data-cat="emulator"><i class="fas fa-gamepad"></i> Emulator</span>
+                    <span class="cat-tab" data-cat="entertainment"><i class="fas fa-tv"></i> Entertainment</span>
+                    <span class="cat-tab" data-cat="events"><i class="fas fa-calendar-check"></i> Events</span>
+                    <span class="cat-tab" data-cat="finance"><i class="fas fa-chart-line"></i> Finance</span>
+                    <span class="cat-tab" data-cat="food-drink"><i class="fas fa-utensils"></i> Food & Drink</span>
+                    <span class="cat-tab" data-cat="health-fitness"><i class="fas fa-heartbeat"></i> Health & Fitness</span>
+                    <span class="cat-tab" data-cat="house-home"><i class="fas fa-home"></i> House & Home</span>
+                    <span class="cat-tab" data-cat="libraries-demo"><i class="fas fa-code"></i> Libraries & Demo</span>
+                    <span class="cat-tab" data-cat="lifestyle"><i class="fas fa-sun"></i> Lifestyle</span>
+                    <span class="cat-tab" data-cat="maps-navigation"><i class="fas fa-map-marked-alt"></i> Maps & Navigation</span>
+                    <span class="cat-tab" data-cat="medical"><i class="fas fa-medkit"></i> Medical</span>
+                    <span class="cat-tab" data-cat="music-audio"><i class="fas fa-music"></i> Music & Audio</span>
+                    <span class="cat-tab" data-cat="news-magazines"><i class="fas fa-newspaper"></i> News & Magazines</span>
+                    <span class="cat-tab" data-cat="parenting"><i class="fas fa-baby"></i> Parenting</span>
+                    <span class="cat-tab" data-cat="personalization"><i class="fas fa-paint-brush"></i> Personalization</span>
+                    <span class="cat-tab" data-cat="photography"><i class="fas fa-camera"></i> Photography</span>
+                    <span class="cat-tab" data-cat="productivity"><i class="fas fa-tasks"></i> Productivity</span>
+                    <span class="cat-tab" data-cat="shopping"><i class="fas fa-shopping-bag"></i> Shopping</span>
+                    <span class="cat-tab" data-cat="social"><i class="fas fa-share-alt"></i> Social</span>
+                    <span class="cat-tab" data-cat="sport"><i class="fas fa-futbol"></i> Sports</span>
+                    <span class="cat-tab" data-cat="tools"><i class="fas fa-tools"></i> Tools</span>
+                    <span class="cat-tab" data-cat="travel-local"><i class="fas fa-plane"></i> Travel & Local</span>
+                    <span class="cat-tab" data-cat="video-players"><i class="fas fa-video"></i> Video Players & Editors</span>
+                    <span class="cat-tab" data-cat="weather"><i class="fas fa-cloud-sun"></i> Weather</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- BOTTOM NAVIGATION -->
+        <!-- ========================================================== -->
+        <div class="bottom-nav">
+            <div class="container">
+                <div class="nav-links">
+                    <a href="#" class="active"><i class="fas fa-home"></i> Home</a>
+                    <a href="#"><i class="fas fa-apps"></i> Apps</a>
+                    <a href="#"><i class="fas fa-gamepad"></i> Games</a>
+                    <a href="#"><i class="fas fa-newspaper"></i> News</a>
+                    <a href="#"><i class="fas fa-search"></i> Browse</a>
+                </div>
             </div>
         </div>
 
@@ -129,10 +177,39 @@
                         <div class="form-group">
                             <label>Category <span class="required">*</span></label>
                             <select id="category" required>
-                                <option value="apps">Apps</option>
-                                <option value="games">Games</option>
-                                <option value="mods">Mods</option>
+                                <option value="art-design">Art & Design</option>
+                                <option value="auto-vehicles">Auto & Vehicles</option>
+                                <option value="beauty">Beauty</option>
+                                <option value="books-reference">Books & Reference</option>
+                                <option value="business">Business</option>
+                                <option value="comics">Comics</option>
+                                <option value="communication">Communication</option>
+                                <option value="dating">Dating</option>
+                                <option value="education">Education</option>
+                                <option value="emulator">Emulator</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="events">Events</option>
+                                <option value="finance">Finance</option>
+                                <option value="food-drink">Food & Drink</option>
+                                <option value="health-fitness">Health & Fitness</option>
+                                <option value="house-home">House & Home</option>
+                                <option value="libraries-demo">Libraries & Demo</option>
+                                <option value="lifestyle">Lifestyle</option>
+                                <option value="maps-navigation">Maps & Navigation</option>
+                                <option value="medical">Medical</option>
+                                <option value="music-audio">Music & Audio</option>
+                                <option value="news-magazines">News & Magazines</option>
+                                <option value="parenting">Parenting</option>
+                                <option value="personalization">Personalization</option>
+                                <option value="photography">Photography</option>
+                                <option value="productivity">Productivity</option>
+                                <option value="shopping">Shopping</option>
+                                <option value="social">Social</option>
+                                <option value="sport">Sports</option>
                                 <option value="tools">Tools</option>
+                                <option value="travel-local">Travel & Local</option>
+                                <option value="video-players">Video Players & Editors</option>
+                                <option value="weather">Weather</option>
                             </select>
                         </div>
                     </div>
@@ -187,9 +264,11 @@
                 <p class="text-muted mt-10"><i class="fas fa-shield-alt"></i> Admin panel is hidden from public.</p>
             </div>
 
-            <!-- APK GRID -->
+            <!-- ========================================================== -->
+            <!-- APK GRID - LITEAPKS STYLE -->
+            <!-- ========================================================== -->
             <div class="section-title">
-                <h2><i class="fas fa-download"></i> Latest APKs</h2>
+                <h2><i class="fas fa-download"></i> <span id="categoryTitle">Latest APKs</span></h2>
                 <span class="count" id="resultCount">Showing 0 results</span>
             </div>
 
@@ -197,6 +276,41 @@
                 <div class="empty-state">
                     <i class="fas fa-spinner fa-spin"></i>
                     <h3>Loading APKs...</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- ABOUT US SECTION -->
+        <!-- ========================================================== -->
+        <div class="about-section">
+            <div class="container">
+                <div class="about-grid">
+                    <div class="about-col">
+                        <h4><i class="fas fa-info-circle"></i> About Us</h4>
+                        <ul>
+                            <li><a href="#"><i class="fas fa-user"></i> About US</a></li>
+                            <li><a href="#"><i class="fas fa-ad"></i> Advertiser</a></li>
+                            <li><a href="https://t.me/modsowner_bot" target="_blank"><i class="fas fa-envelope"></i> Contact</a></li>
+                            <li><a href="#"><i class="fas fa-briefcase"></i> Modding Job</a></li>
+                            <li><a href="#"><i class="fas fa-cogs"></i> Modding Required</a></li>
+                            <li><a href="#"><i class="fas fa-flag"></i> Report</a></li>
+                        </ul>
+                    </div>
+                    <div class="about-col">
+                        <h4><i class="fas fa-link"></i> Useful Sections</h4>
+                        <ul>
+                            <li><a href="#"><i class="fas fa-home"></i> Home</a></li>
+                            <li><a href="#"><i class="fas fa-apps"></i> Apps</a></li>
+                            <li><a href="#"><i class="fas fa-gamepad"></i> Games</a></li>
+                        </ul>
+                    </div>
+                    <div class="about-col">
+                        <h4><i class="fas fa-download"></i> Top Downloads</h4>
+                        <ul id="topDownloadsList">
+                            <li>Loading...</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -246,11 +360,11 @@
 
                 <div class="detail-desc" id="detailDesc">Description...</div>
 
-                <!-- DOWNLOAD BUTTON -->
+                <!-- DOWNLOAD SECTION - OPENS IN NEW TAB -->
                 <div class="download-section">
-                    <a href="#" id="detailDownloadBtn" class="btn-download-main" target="_blank">
+                    <a href="#" id="detailDownloadBtn" class="btn-download-main" target="_blank" rel="noopener noreferrer">
                         <i class="fas fa-download"></i> Download APK
-                        <span class="size-tag">Direct Link</span>
+                        <span class="size-tag">Opens in new tab</span>
                     </a>
                 </div>
 
