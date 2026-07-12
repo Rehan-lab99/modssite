@@ -4,113 +4,73 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const mongoose = require('mongoose');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// ============================================================
+//  MONGODB CONNECTION
+// ============================================================
+// YAHAN APNA MONGODB CONNECTION STRING DAALEIN
+const MONGODB_URI = 'mongodb+srv://mdrehanshaikh913620_db_user:<db_password>@cluster0.tqtiw9l.mongodb.net/?appName=Cluster0';
+
+mongoose.connect(MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', () => {
+    console.log('✅ Connected to MongoDB Atlas - Data is PERMANENT!');
+});
+
+// ============================================================
+//  MONGOOSE SCHEMA
+// ============================================================
+const commentSchema = new mongoose.Schema({
+    user: String,
+    text: String,
+    time: Number
+});
+
+const apkSchema = new mongoose.Schema({
+    id: { type: String, unique: true },
+    title: String,
+    category: String,
+    version: String,
+    size: String,
+    android: String,
+    description: String,
+    icon: String,
+    downloadLink: String,
+    views: Number,
+    downloads: Number,
+    comments: [commentSchema],
+    viewedSessions: [String],
+    createdAt: Number
+});
+
+const APK = mongoose.model('APK', apkSchema);
+
+// ============================================================
+//  MIDDLEWARE
+// ============================================================
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
 
-// Database setup
-const DATA_DIR = path.join(__dirname, 'data');
+// ============================================================
+//  FILE UPLOAD
+// ============================================================
 const UPLOAD_DIR = path.join(__dirname, 'uploads');
-const APKS_FILE = path.join(DATA_DIR, 'apks.json');
-
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
 
-// Initialize APKs file
-if (!fs.existsSync(APKS_FILE)) {
-    const sampleApks = [{
-        id: '1',
-        title: 'Spotify Premium Mod',
-        category: 'apps',
-        version: '8.9.18.512',
-        size: '72.5 MB',
-        android: '5.0+',
-        description: 'Spotify Premium Mod APK - Unlimited skips, no ads, offline downloads, and all premium features unlocked. The best music streaming app with millions of songs.',
-        icon: '',
-        screenshots: [],
-        downloadLink: 'https://example.com/spotify-premium-mod.apk',
-        views: 2847,
-        downloads: 1253,
-        comments: [
-            { user: 'Rahul', text: 'Working perfectly! Thanks 🔥', time: Date.now() - 3600000 },
-            { user: 'Priya', text: 'No ads, amazing app! 💯', time: Date.now() - 7200000 }
-        ],
-        viewedSessions: [],
-        createdAt: Date.now()
-    }, {
-        id: '2',
-        title: 'Minecraft Premium',
-        category: 'games',
-        version: '1.20.81.01',
-        size: '185.3 MB',
-        android: '5.0+',
-        description: 'Minecraft Premium APK - Full unlocked game with all features. Build, explore, and survive in infinite worlds. Includes all latest updates.',
-        icon: '',
-        screenshots: [],
-        downloadLink: 'https://example.com/minecraft-premium.apk',
-        views: 1953,
-        downloads: 876,
-        comments: [
-            { user: 'Amit', text: 'Best game ever! 🎮', time: Date.now() - 1800000 }
-        ],
-        viewedSessions: [],
-        createdAt: Date.now()
-    }, {
-        id: '3',
-        title: 'GCam Mod 8.9',
-        category: 'apps',
-        version: '8.9.097',
-        size: '124.8 MB',
-        android: '8.0+',
-        description: 'Google Camera Mod APK - Enhanced camera features, night mode, portrait mode, and HDR+ for all Android devices. Professional quality photos.',
-        icon: '',
-        screenshots: [],
-        downloadLink: 'https://example.com/gcam-mod.apk',
-        views: 1421,
-        downloads: 543,
-        comments: [
-            { user: 'Vikram', text: 'Camera quality improved a lot! 📸', time: Date.now() - 900000 }
-        ],
-        viewedSessions: [],
-        createdAt: Date.now()
-    }, {
-        id: '4',
-        title: 'Subway Surfers Mod',
-        category: 'games',
-        version: '3.25.0',
-        size: '95.2 MB',
-        android: '4.4+',
-        description: 'Subway Surfers Mod APK - Unlimited coins, keys, and power-ups. All characters and boards unlocked. The most popular runner game.',
-        icon: '',
-        screenshots: [],
-        downloadLink: 'https://example.com/subway-surfers-mod.apk',
-        views: 876,
-        downloads: 412,
-        comments: [
-            { user: 'Neha', text: 'Unlimited coins working! 🏃', time: Date.now() - 300000 }
-        ],
-        viewedSessions: [],
-        createdAt: Date.now()
-    }];
-    fs.writeFileSync(APKS_FILE, JSON.stringify(sampleApks, null, 2));
-}
-
-// File upload config
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        if (file.fieldname === 'icon') {
-            cb(null, UPLOAD_DIR);
-        } else {
-            cb(null, UPLOAD_DIR);
-        }
-    },
+    destination: (req, file, cb) => cb(null, UPLOAD_DIR),
     filename: (req, file, cb) => {
         const ext = path.extname(file.originalname);
         cb(null, uuidv4() + ext);
@@ -119,7 +79,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 100 * 1024 * 1024 }, // 100MB limit
+    limits: { fileSize: 100 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         if (file.fieldname === 'icon') {
             const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
@@ -135,15 +95,64 @@ const upload = multer({
 });
 
 // ============================================================
+//  INIT SAMPLE DATA (ONLY IF EMPTY)
+// ============================================================
+async function initSampleData() {
+    const count = await APK.countDocuments();
+    if (count === 0) {
+        const samples = [
+            {
+                id: '1',
+                title: 'Spotify Premium Mod',
+                category: 'music-audio',
+                version: '8.9.18.512',
+                size: '72.5 MB',
+                android: '5.0+',
+                description: 'Spotify Premium Mod APK - Unlimited skips, no ads, offline downloads, and all premium features unlocked.',
+                icon: '',
+                downloadLink: 'https://example.com/spotify-premium-mod.apk',
+                views: 2847,
+                downloads: 1253,
+                comments: [
+                    { user: 'Rahul', text: 'Working perfectly! Thanks 🔥', time: Date.now() - 3600000 },
+                    { user: 'Priya', text: 'No ads, amazing app! 💯', time: Date.now() - 7200000 }
+                ],
+                viewedSessions: [],
+                createdAt: Date.now()
+            },
+            {
+                id: '2',
+                title: 'Minecraft Premium',
+                category: 'games',
+                version: '1.20.81.01',
+                size: '185.3 MB',
+                android: '5.0+',
+                description: 'Minecraft Premium APK - Full unlocked game with all features. Build, explore, and survive.',
+                icon: '',
+                downloadLink: 'https://example.com/minecraft-premium.apk',
+                views: 1953,
+                downloads: 876,
+                comments: [
+                    { user: 'Amit', text: 'Best game ever! 🎮', time: Date.now() - 1800000 }
+                ],
+                viewedSessions: [],
+                createdAt: Date.now()
+            }
+        ];
+        await APK.insertMany(samples);
+        console.log('📦 Sample data inserted into MongoDB');
+    }
+}
+initSampleData();
+
+// ============================================================
 //  API ENDPOINTS
 // ============================================================
 
 // Get all APKs
-app.get('/api/apks', (req, res) => {
+app.get('/api/apks', async (req, res) => {
     try {
-        const apks = JSON.parse(fs.readFileSync(APKS_FILE));
-        // Sort by newest first
-        apks.sort((a, b) => b.createdAt - a.createdAt);
+        const apks = await APK.find().sort({ createdAt: -1 });
         res.json(apks);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch APKs' });
@@ -151,10 +160,9 @@ app.get('/api/apks', (req, res) => {
 });
 
 // Get single APK
-app.get('/api/apks/:id', (req, res) => {
+app.get('/api/apks/:id', async (req, res) => {
     try {
-        const apks = JSON.parse(fs.readFileSync(APKS_FILE));
-        const apk = apks.find(a => a.id === req.params.id);
+        const apk = await APK.findOne({ id: req.params.id });
         if (!apk) return res.status(404).json({ error: 'APK not found' });
         res.json(apk);
     } catch (error) {
@@ -163,65 +171,65 @@ app.get('/api/apks/:id', (req, res) => {
 });
 
 // Add/Update APK
-app.post('/api/apks', upload.fields([
-    { name: 'icon', maxCount: 1 }
-]), (req, res) => {
+app.post('/api/apks', upload.fields([{ name: 'icon', maxCount: 1 }]), async (req, res) => {
     try {
-        const apks = JSON.parse(fs.readFileSync(APKS_FILE));
         const { id, title, category, version, size, android, description, downloadLink, iconData } = req.body;
 
-        const apkData = {
-            title: title,
-            category: category || 'apps',
-            version: version || '1.0.0',
-            size: size || '10 MB',
-            android: android || '5.0+',
-            description: description || '',
-            downloadLink: downloadLink || '',
-            views: 0,
-            downloads: 0,
-            comments: [],
-            viewedSessions: [],
-            createdAt: Date.now(),
-            screenshots: []
-        };
-
-        // Handle icon upload
+        let iconUrl = '';
         if (req.files && req.files.icon && req.files.icon[0]) {
-            apkData.icon = '/uploads/' + req.files.icon[0].filename;
+            iconUrl = '/uploads/' + req.files.icon[0].filename;
         } else if (iconData && iconData.startsWith('data:image')) {
-            apkData.icon = iconData;
+            iconUrl = iconData;
         } else if (iconData) {
-            apkData.icon = iconData;
-        } else {
-            apkData.icon = '';
+            iconUrl = iconData;
         }
 
         if (id && id !== '') {
             // UPDATE
-            const index = apks.findIndex(a => a.id === id);
-            if (index !== -1) {
-                apkData.views = apks[index].views || 0;
-                apkData.downloads = apks[index].downloads || 0;
-                apkData.comments = apks[index].comments || [];
-                apkData.viewedSessions = apks[index].viewedSessions || [];
-                apkData.createdAt = apks[index].createdAt || Date.now();
-                if (!req.files || !req.files.icon || !req.files.icon[0]) {
-                    apkData.icon = apks[index].icon;
-                }
-                apkData.id = id;
-                apks[index] = apkData;
-            } else {
-                return res.status(404).json({ error: 'APK not found' });
-            }
+            const existing = await APK.findOne({ id: id });
+            if (!existing) return res.status(404).json({ error: 'APK not found' });
+
+            // Preserve views, downloads, comments, viewedSessions
+            const updateData = {
+                title: title,
+                category: category,
+                version: version || '1.0',
+                size: size || '10 MB',
+                android: android || '5.0+',
+                description: description || '',
+                downloadLink: downloadLink || '',
+                icon: iconUrl || existing.icon,
+                views: existing.views || 0,
+                downloads: existing.downloads || 0,
+                comments: existing.comments || [],
+                viewedSessions: existing.viewedSessions || [],
+                createdAt: existing.createdAt || Date.now()
+            };
+
+            await APK.updateOne({ id: id }, updateData);
+            const updated = await APK.findOne({ id: id });
+            res.json({ success: true, apk: updated });
         } else {
             // ADD NEW
-            apkData.id = uuidv4();
-            apks.push(apkData);
+            const newApk = new APK({
+                id: uuidv4(),
+                title: title,
+                category: category,
+                version: version || '1.0',
+                size: size || '10 MB',
+                android: android || '5.0+',
+                description: description || '',
+                downloadLink: downloadLink || '',
+                icon: iconUrl,
+                views: 0,
+                downloads: 0,
+                comments: [],
+                viewedSessions: [],
+                createdAt: Date.now()
+            });
+            await newApk.save();
+            res.json({ success: true, apk: newApk });
         }
-
-        fs.writeFileSync(APKS_FILE, JSON.stringify(apks, null, 2));
-        res.json({ success: true, apk: apkData });
     } catch (error) {
         console.error('Error saving APK:', error);
         res.status(500).json({ error: 'Failed to save APK' });
@@ -229,14 +237,12 @@ app.post('/api/apks', upload.fields([
 });
 
 // Delete APK
-app.delete('/api/apks/:id', (req, res) => {
+app.delete('/api/apks/:id', async (req, res) => {
     try {
-        const apks = JSON.parse(fs.readFileSync(APKS_FILE));
-        const filtered = apks.filter(a => a.id !== req.params.id);
-        if (filtered.length === apks.length) {
+        const result = await APK.deleteOne({ id: req.params.id });
+        if (result.deletedCount === 0) {
             return res.status(404).json({ error: 'APK not found' });
         }
-        fs.writeFileSync(APKS_FILE, JSON.stringify(filtered, null, 2));
         res.json({ success: true });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete APK' });
@@ -244,10 +250,9 @@ app.delete('/api/apks/:id', (req, res) => {
 });
 
 // Track view
-app.post('/api/apks/:id/view', (req, res) => {
+app.post('/api/apks/:id/view', async (req, res) => {
     try {
-        const apks = JSON.parse(fs.readFileSync(APKS_FILE));
-        const apk = apks.find(a => a.id === req.params.id);
+        const apk = await APK.findOne({ id: req.params.id });
         if (!apk) return res.status(404).json({ error: 'APK not found' });
 
         const { sessionId } = req.body;
@@ -256,7 +261,7 @@ app.post('/api/apks/:id/view', (req, res) => {
         if (!apk.viewedSessions.includes(sessionId)) {
             apk.viewedSessions.push(sessionId);
             apk.views = (apk.views || 0) + 1;
-            fs.writeFileSync(APKS_FILE, JSON.stringify(apks, null, 2));
+            await apk.save();
         }
 
         res.json({ success: true, views: apk.views });
@@ -266,14 +271,13 @@ app.post('/api/apks/:id/view', (req, res) => {
 });
 
 // Track download
-app.post('/api/apks/:id/download', (req, res) => {
+app.post('/api/apks/:id/download', async (req, res) => {
     try {
-        const apks = JSON.parse(fs.readFileSync(APKS_FILE));
-        const apk = apks.find(a => a.id === req.params.id);
+        const apk = await APK.findOne({ id: req.params.id });
         if (!apk) return res.status(404).json({ error: 'APK not found' });
 
         apk.downloads = (apk.downloads || 0) + 1;
-        fs.writeFileSync(APKS_FILE, JSON.stringify(apks, null, 2));
+        await apk.save();
 
         res.json({ success: true, downloads: apk.downloads });
     } catch (error) {
@@ -282,10 +286,9 @@ app.post('/api/apks/:id/download', (req, res) => {
 });
 
 // Add comment
-app.post('/api/apks/:id/comment', (req, res) => {
+app.post('/api/apks/:id/comment', async (req, res) => {
     try {
-        const apks = JSON.parse(fs.readFileSync(APKS_FILE));
-        const apk = apks.find(a => a.id === req.params.id);
+        const apk = await APK.findOne({ id: req.params.id });
         if (!apk) return res.status(404).json({ error: 'APK not found' });
 
         const { user, text } = req.body;
@@ -299,8 +302,8 @@ app.post('/api/apks/:id/comment', (req, res) => {
             text: text.trim(),
             time: Date.now()
         });
+        await apk.save();
 
-        fs.writeFileSync(APKS_FILE, JSON.stringify(apks, null, 2));
         res.json({ success: true, comments: apk.comments });
     } catch (error) {
         res.status(500).json({ error: 'Failed to add comment' });
@@ -308,9 +311,9 @@ app.post('/api/apks/:id/comment', (req, res) => {
 });
 
 // Get stats
-app.get('/api/stats', (req, res) => {
+app.get('/api/stats', async (req, res) => {
     try {
-        const apks = JSON.parse(fs.readFileSync(APKS_FILE));
+        const apks = await APK.find();
         let totalViews = 0;
         let totalDownloads = 0;
         let totalComments = 0;
@@ -337,22 +340,14 @@ app.get('/api/stats', (req, res) => {
     }
 });
 
-// Get categories stats
-app.get('/api/categories', (req, res) => {
+// Get categories
+app.get('/api/categories', async (req, res) => {
     try {
-        const apks = JSON.parse(fs.readFileSync(APKS_FILE));
-        const categories = {
-            apps: 0,
-            games: 0,
-            mods: 0,
-            tools: 0
-        };
+        const apks = await APK.find();
+        const categories = {};
         apks.forEach(a => {
-            if (categories[a.category] !== undefined) {
-                categories[a.category]++;
-            } else {
-                categories['apps']++;
-            }
+            const cat = a.category || 'apps';
+            categories[cat] = (categories[cat] || 0) + 1;
         });
         res.json(categories);
     } catch (error) {
@@ -360,31 +355,27 @@ app.get('/api/categories', (req, res) => {
     }
 });
 
-// Serve frontend
+// ============================================================
+//  SERVE FRONTEND
+// ============================================================
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// ============================================================
+//  START SERVER
+// ============================================================
 app.listen(PORT, () => {
     console.log(`
     ╔══════════════════════════════════════════════════════════╗
     ║                                                          ║
-    ║   📱 LiteAPKS Clone Server Started!                     ║
+    ║   📱 ModsCom Server Started!                            ║
     ║                                                          ║
     ║   🌐 http://localhost:${PORT}                             ║
     ║                                                          ║
-    ║   🔑 Admin Access: http://localhost:${PORT}#x7K9mP2qL4nR8 ║
+    ║   🗄️  MongoDB Atlas Connected - DATA IS PERMANENT!      ║
     ║                                                          ║
-    ║   📊 API Endpoints:                                     ║
-    ║   GET  /api/apks       - All APKs                      ║
-    ║   GET  /api/apks/:id   - Single APK                    ║
-    ║   POST /api/apks       - Add/Update APK                ║
-    ║   DELETE /api/apks/:id - Delete APK                   ║
-    ║   POST /api/apks/:id/view - Track view               ║
-    ║   POST /api/apks/:id/download - Track download       ║
-    ║   POST /api/apks/:id/comment - Add comment           ║
-    ║   GET  /api/stats       - Get stats                  ║
-    ║   GET  /api/categories  - Get categories             ║
+    ║   🔑 Admin Access: http://localhost:${PORT}#x7K9mP2qL4nR8 ║
     ║                                                          ║
     ╚══════════════════════════════════════════════════════════╝
     `);
