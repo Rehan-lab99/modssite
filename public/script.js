@@ -11,7 +11,6 @@ const API_URL = '/api';
 let isAdminUnlocked = false;
 let currentCategory = 'all';
 let searchQuery = '';
-let currentDetailId = null;
 let apksData = [];
 let sessionId = localStorage.getItem('viewer_session_id');
 if (!sessionId) {
@@ -21,54 +20,28 @@ if (!sessionId) {
 
 // Category name mapping
 const categoryNames = {
-    'all': 'Latest APKs',
-    'art-design': 'Art & Design',
-    'auto-vehicles': 'Auto & Vehicles',
-    'beauty': 'Beauty',
-    'books-reference': 'Books & Reference',
-    'business': 'Business',
-    'comics': 'Comics',
-    'communication': 'Communication',
-    'dating': 'Dating',
-    'education': 'Education',
-    'emulator': 'Emulator',
-    'entertainment': 'Entertainment',
-    'events': 'Events',
-    'finance': 'Finance',
-    'food-drink': 'Food & Drink',
-    'health-fitness': 'Health & Fitness',
-    'house-home': 'House & Home',
-    'libraries-demo': 'Libraries & Demo',
-    'lifestyle': 'Lifestyle',
-    'maps-navigation': 'Maps & Navigation',
-    'medical': 'Medical',
-    'music-audio': 'Music & Audio',
-    'news-magazines': 'News & Magazines',
-    'parenting': 'Parenting',
-    'personalization': 'Personalization',
-    'photography': 'Photography',
-    'productivity': 'Productivity',
-    'shopping': 'Shopping',
-    'social': 'Social',
-    'sport': 'Sports',
+    'apps': 'Apps',
+    'games': 'Games',
+    'mods': 'Mods',
     'tools': 'Tools',
-    'travel-local': 'Travel & Local',
     'video-players': 'Video Players & Editors',
-    'weather': 'Weather'
+    'music-audio': 'Music & Audio',
+    'communication': 'Communication',
+    'personalization': 'Personalization'
 };
 
 // ============================================================
 //  DOM REFS
 // ============================================================
-const grid = document.getElementById('apkGrid');
+const latestGrid = document.getElementById('latestGrid');
+const hotGrid = document.getElementById('hotGrid');
+const allGrid = document.getElementById('allGrid');
 const searchInput = document.getElementById('searchInput');
 const searchBtn = document.getElementById('searchBtn');
-const catTabs = document.querySelectorAll('.category-grid .cat-tab');
 const adminPanel = document.getElementById('secretAdminPanel');
 const closeAdminPanelBtn = document.getElementById('closeAdminPanelBtn');
 const resultCount = document.getElementById('resultCount');
 const totalCount = document.getElementById('totalCount');
-const categoryTitle = document.getElementById('categoryTitle');
 
 const adminStatsContainer = document.getElementById('adminStatsContainer');
 
@@ -78,7 +51,7 @@ const titleInput = document.getElementById('title');
 const categorySelect = document.getElementById('category');
 const versionInput = document.getElementById('version');
 const sizeInput = document.getElementById('size');
-const androidInput = document.getElementById('android');
+const developerInput = document.getElementById('developer');
 const descInput = document.getElementById('description');
 const downloadLinkInput = document.getElementById('downloadLink');
 const iconInput = document.getElementById('iconInput');
@@ -88,29 +61,6 @@ const iconData = document.getElementById('iconData');
 const saveBtn = document.getElementById('saveBtn');
 const resetBtn = document.getElementById('resetBtn');
 const clearAllBtn = document.getElementById('clearAllBtn');
-
-const detailOverlay = document.getElementById('detailOverlay');
-const detailTitle = document.getElementById('detailTitle');
-const detailCategory = document.getElementById('detailCategory');
-const detailVersion = document.getElementById('detailVersion');
-const detailSize = document.getElementById('detailSize');
-const detailAndroid = document.getElementById('detailAndroid');
-const detailDesc = document.getElementById('detailDesc');
-const detailViews = document.getElementById('detailViews');
-const detailDownloads = document.getElementById('detailDownloads');
-const detailCommentCount = document.getElementById('detailCommentCount');
-const detailCommentCount2 = document.getElementById('detailCommentCount2');
-const detailIconImg = document.getElementById('detailIconImg');
-const detailNoIcon = document.querySelector('.detail-icon .no-icon');
-const detailDownloadBtn = document.getElementById('detailDownloadBtn');
-const commentList = document.getElementById('commentList');
-const commentInput = document.getElementById('commentInput');
-const commentName = document.getElementById('commentName');
-const commentSubmitBtn = document.getElementById('commentSubmitBtn');
-const detailEditBtn = document.getElementById('detailEditBtn');
-const detailDeleteBtn = document.getElementById('detailDeleteBtn');
-const detailCloseBtn = document.getElementById('detailCloseBtn');
-const detailCloseBtn2 = document.getElementById('detailCloseBtn2');
 
 const adminLoginPage = document.getElementById('adminLoginPage');
 const adminLoginPassword = document.getElementById('adminLoginPassword');
@@ -180,28 +130,26 @@ async function deleteAPK(id) {
     return false;
 }
 
-async function trackView(id) {
-    await apiFetch('/apks/' + id + '/view', {
-        method: 'POST',
-        body: JSON.stringify({ sessionId })
-    });
-}
-
-async function trackDownload(id) {
-    await apiFetch('/apks/' + id + '/download', { method: 'POST' });
-}
-
-async function addComment(id, user, text) {
-    const data = await apiFetch('/apks/' + id + '/comment', {
-        method: 'POST',
-        body: JSON.stringify({ user, text })
-    });
-    return data && data.success;
-}
-
 async function getStats() {
     const data = await apiFetch('/stats');
     return data;
+}
+
+// ============================================================
+//  TELEGRAM FUNCTION
+// ============================================================
+function openTelegram() {
+    window.open('https://t.me/modsowner_bot', '_blank');
+}
+
+// ============================================================
+//  FILTER CATEGORY
+// ============================================================
+function filterCategory(category) {
+    currentCategory = category;
+    render();
+    // Scroll to results
+    document.querySelector('.section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ============================================================
@@ -218,7 +166,7 @@ function updateTopDownloads() {
     }
 
     container.innerHTML = top5.map(apk => `
-        <li><a href="#" onclick="openDetail('${apk.id}'); return false;">
+        <li><a href="/detail.html?id=${apk.id}" target="_blank">
             <i class="fas fa-download"></i> ${apk.title}
             <span style="float:right;color:var(--accent);">${(apk.downloads || 0)}</span>
         </a></li>
@@ -241,7 +189,6 @@ async function updateAdminStats() {
         document.getElementById('statViews').textContent = stats.totalViews.toLocaleString();
         document.getElementById('statDownloads').textContent = stats.totalDownloads.toLocaleString();
         document.getElementById('statComments').textContent = stats.totalComments;
-        document.getElementById('statUsers').textContent = stats.activeUsers;
 
         document.getElementById('dashApks').textContent = stats.totalApks;
         document.getElementById('dashViews').textContent = stats.totalViews.toLocaleString();
@@ -249,6 +196,36 @@ async function updateAdminStats() {
         document.getElementById('dashComments').textContent = stats.totalComments;
         totalCount.textContent = stats.totalApks;
     }
+}
+
+// ============================================================
+//  RENDER APK CARD
+// ============================================================
+function renderApkCard(apk) {
+    return `
+        <div class="apk-card" onclick="window.open('/detail.html?id=${apk.id}', '_blank')">
+            <div class="apk-icon">
+                ${apk.icon ? `<img src="${apk.icon}" alt="${apk.title}" loading="lazy" />` : `<span class="no-icon"><i class="fas fa-android"></i></span>`}
+            </div>
+            <div class="apk-info">
+                <h3>${escapeHtml(apk.title)}</h3>
+                <div class="meta">
+                    <span><i class="fas fa-tag"></i> ${escapeHtml(categoryNames[apk.category] || apk.category || 'Apps')}</span>
+                    <span><i class="fas fa-download"></i> ${(apk.downloads || 0).toLocaleString()}</span>
+                </div>
+            </div>
+            <div class="apk-downloads">
+                <i class="fas fa-download"></i> ${(apk.downloads || 0).toLocaleString()}
+            </div>
+        </div>
+    `;
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // ============================================================
@@ -270,12 +247,21 @@ function render() {
         );
     }
 
-    // Update category title
-    categoryTitle.textContent = categoryNames[currentCategory] || 'Latest APKs';
+    // Latest Updates - Last 5 (by createdAt)
+    const latest = [...apksData].sort((a, b) => b.createdAt - a.createdAt).slice(0, 5);
+    latestGrid.innerHTML = latest.length > 0 ? latest.map(renderApkCard).join('') : 
+        '<div class="empty-state"><i class="fas fa-clock"></i><h3>No latest updates</h3></div>';
+
+    // Hot & Exclusive - Top 5 by downloads
+    const hot = [...apksData].sort((a, b) => (b.downloads || 0) - (a.downloads || 0)).slice(0, 5);
+    hotGrid.innerHTML = hot.length > 0 ? hot.map(renderApkCard).join('') : 
+        '<div class="empty-state"><i class="fas fa-fire"></i><h3>No hot APKs yet</h3></div>';
+
+    // All APKs
     resultCount.textContent = `Showing ${filtered.length} results`;
 
     if (filtered.length === 0) {
-        grid.innerHTML = `
+        allGrid.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-android"></i>
                 <h3>No APKs found</h3>
@@ -286,152 +272,8 @@ function render() {
     }
 
     filtered.sort((a, b) => b.createdAt - a.createdAt);
-
-    grid.innerHTML = filtered.map(apk => `
-        <div class="apk-card" data-id="${apk.id}">
-            <div class="apk-icon">
-                ${apk.icon ? `<img src="${apk.icon}" alt="${apk.title}" loading="lazy" />` : `<span class="no-icon"><i class="fas fa-android"></i></span>`}
-            </div>
-            <div class="apk-info">
-                <h3>${escapeHtml(apk.title)}</h3>
-                <div class="meta">
-                    <span><i class="fas fa-tag"></i> ${escapeHtml(categoryNames[apk.category] || apk.category || 'Apps')}</span>
-                    <span><i class="fas fa-code-branch"></i> ${escapeHtml(apk.version || '1.0')}</span>
-                    <span><i class="fas fa-hdd"></i> ${escapeHtml(apk.size || '10 MB')}</span>
-                </div>
-            </div>
-            <div class="apk-downloads">
-                <i class="fas fa-download"></i> ${(apk.downloads || 0).toLocaleString()}
-            </div>
-        </div>
-    `).join('');
-
-    document.querySelectorAll('.apk-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const id = card.dataset.id;
-            openDetail(id);
-        });
-    });
+    allGrid.innerHTML = filtered.map(renderApkCard).join('');
 }
-
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-// ============================================================
-//  DETAIL OVERLAY
-// ============================================================
-async function openDetail(id) {
-    const apk = apksData.find(a => a.id === id);
-    if (!apk) return;
-
-    currentDetailId = id;
-
-    await trackView(id);
-
-    await loadAPKs();
-    const updatedApk = apksData.find(a => a.id === id);
-    if (!updatedApk) return;
-
-    detailTitle.textContent = updatedApk.title;
-    detailCategory.textContent = categoryNames[updatedApk.category] || updatedApk.category || 'Apps';
-    detailVersion.textContent = updatedApk.version || '1.0';
-    detailSize.textContent = updatedApk.size || '10 MB';
-    detailAndroid.textContent = updatedApk.android || '5.0+';
-    detailDesc.textContent = updatedApk.description || 'No description available.';
-    detailViews.textContent = (updatedApk.views || 0).toLocaleString();
-    detailDownloads.textContent = (updatedApk.downloads || 0).toLocaleString();
-
-    if (updatedApk.icon) {
-        detailIconImg.src = updatedApk.icon;
-        detailIconImg.style.display = 'block';
-        detailNoIcon.style.display = 'none';
-    } else {
-        detailIconImg.style.display = 'none';
-        detailNoIcon.style.display = 'flex';
-    }
-
-    if (updatedApk.downloadLink && updatedApk.downloadLink.trim() !== '') {
-        detailDownloadBtn.href = updatedApk.downloadLink;
-        detailDownloadBtn.style.display = 'inline-flex';
-        detailDownloadBtn.onclick = () => {
-            trackDownload(id);
-        };
-    } else {
-        detailDownloadBtn.style.display = 'none';
-    }
-
-    const comments = updatedApk.comments || [];
-    detailCommentCount.textContent = comments.length;
-    detailCommentCount2.textContent = comments.length;
-
-    if (comments.length === 0) {
-        commentList.innerHTML = `
-            <div style="text-align:center;padding:16px;color:var(--text-muted);font-size:0.85rem;">
-                <i class="fas fa-comment" style="opacity:0.3;"></i> No comments yet. Be the first!
-            </div>
-        `;
-    } else {
-        commentList.innerHTML = comments.map(c => `
-            <div class="comment-item">
-                <div class="comment-user">
-                    <i class="fas fa-user-circle"></i> ${escapeHtml(c.user || 'Anonymous')}
-                    <span class="time"><i class="far fa-clock"></i> ${formatTime(c.time)}</span>
-                </div>
-                <div class="comment-text">${escapeHtml(c.text)}</div>
-            </div>
-        `).join('');
-    }
-
-    detailOverlay.classList.add('visible');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeDetail() {
-    detailOverlay.classList.remove('visible');
-    document.body.style.overflow = '';
-    currentDetailId = null;
-}
-
-function formatTime(time) {
-    if (!time) return 'Just now';
-    const date = new Date(time);
-    const now = Date.now();
-    const diff = Math.floor((now - date.getTime()) / 1000);
-    if (diff < 60) return 'Just now';
-    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
-    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
-    return date.toLocaleDateString();
-}
-
-detailCloseBtn.addEventListener('click', closeDetail);
-detailCloseBtn2.addEventListener('click', closeDetail);
-detailOverlay.addEventListener('click', (e) => {
-    if (e.target === detailOverlay) closeDetail();
-});
-
-// ============================================================
-//  COMMENTS
-// ============================================================
-commentSubmitBtn.addEventListener('click', async () => {
-    const text = commentInput.value.trim();
-    const name = commentName.value.trim() || 'User';
-    if (!text || !currentDetailId) return;
-
-    const success = await addComment(currentDetailId, name, text);
-    if (success) {
-        commentInput.value = '';
-        await loadAPKs();
-        await openDetail(currentDetailId);
-    }
-});
-
-commentInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') commentSubmitBtn.click();
-});
 
 // ============================================================
 //  ADMIN LOGIN
@@ -512,10 +354,10 @@ function openEditForm(id) {
 
     editId.value = apk.id;
     titleInput.value = apk.title;
-    categorySelect.value = apk.category;
+    categorySelect.value = apk.category || 'apps';
     versionInput.value = apk.version || '';
     sizeInput.value = apk.size || '';
-    androidInput.value = apk.android || '';
+    developerInput.value = apk.developer || '';
     descInput.value = apk.description || '';
     downloadLinkInput.value = apk.downloadLink || '';
 
@@ -542,10 +384,10 @@ function openEditForm(id) {
 function resetForm() {
     editId.value = '';
     titleInput.value = '';
-    categorySelect.value = 'art-design';
+    categorySelect.value = 'apps';
     versionInput.value = '';
     sizeInput.value = '';
-    androidInput.value = '';
+    developerInput.value = '';
     descInput.value = '';
     downloadLinkInput.value = '';
     iconData.value = '';
@@ -588,7 +430,7 @@ contentForm.addEventListener('submit', async (e) => {
     formData.append('category', categorySelect.value);
     formData.append('version', versionInput.value.trim());
     formData.append('size', sizeInput.value.trim());
-    formData.append('android', androidInput.value.trim());
+    formData.append('developer', developerInput.value.trim());
     formData.append('description', descInput.value.trim());
     formData.append('downloadLink', downloadLink);
 
@@ -631,34 +473,7 @@ closeAdminPanelBtn.addEventListener('click', () => {
 });
 
 // ============================================================
-//  DETAIL EDIT/DELETE - ADMIN ONLY
-// ============================================================
-detailEditBtn.addEventListener('click', () => {
-    if (currentDetailId) {
-        if (!isAdminUnlocked) {
-            alert('⚠️ Admin access required.');
-            return;
-        }
-        closeDetail();
-        openEditForm(currentDetailId);
-    }
-});
-
-detailDeleteBtn.addEventListener('click', async () => {
-    if (currentDetailId && confirm('Delete this APK?')) {
-        if (!isAdminUnlocked) {
-            alert('⚠️ Admin access required.');
-            return;
-        }
-        await deleteAPK(currentDetailId);
-        closeDetail();
-        await loadAPKs();
-        if (isAdminUnlocked) updateAdminStats();
-    }
-});
-
-// ============================================================
-//  SEARCH & CATEGORY
+//  SEARCH
 // ============================================================
 searchBtn.addEventListener('click', () => {
     searchQuery = searchInput.value;
@@ -670,17 +485,6 @@ searchInput.addEventListener('keydown', (e) => {
         searchQuery = searchInput.value;
         render();
     }
-});
-
-catTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-        catTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        currentCategory = tab.dataset.cat;
-        render();
-        // Scroll to top of results
-        document.querySelector('.section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
 });
 
 // ============================================================
@@ -697,18 +501,6 @@ async function syncData() {
 }
 
 setInterval(syncData, 5000);
-
-// ============================================================
-//  KEYBOARD SHORTCUTS
-// ============================================================
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        if (detailOverlay.classList.contains('visible')) closeDetail();
-        if (adminLoginPage.classList.contains('visible')) {
-            adminLoginPage.classList.remove('visible');
-        }
-    }
-});
 
 // ============================================================
 //  AUTO-LOGOUT
@@ -737,20 +529,19 @@ function resetInactivityTimer() {
 });
 
 // ============================================================
-//  EXPOSE FUNCTIONS FOR HTML onclick
+//  EXPOSE FUNCTIONS
 // ============================================================
-window.openDetail = openDetail;
+window.filterCategory = filterCategory;
+window.openTelegram = openTelegram;
 
 // ============================================================
 //  INIT
 // ============================================================
 loadAPKs();
 
-console.log('📱 ModsCom - LiteAPKS Style Loaded');
+console.log('📱 GETMODAPKS - Style Loaded');
 console.log('🔑 Admin Password: ' + ADMIN_PASSWORD);
 console.log('🔐 Secret URL: Add #' + SECRET_KEY + ' to the URL');
 console.log('📌 Example: ' + window.location.href.split('#')[0] + '#' + SECRET_KEY);
-console.log('📂 Categories: 30+ categories available');
-console.log('👤 Users: Browse, Download & Comment');
-console.log('👑 Admin: Full control with STATS');
-console.log('🔄 Auto-sync every 5 seconds for REAL-TIME updates');
+console.log('📂 Categories: Apps, Games, Mods, Tools');
+console.log('🔄 Auto-sync every 5 seconds');
