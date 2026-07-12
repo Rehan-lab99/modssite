@@ -1,5 +1,5 @@
 /* ============================================================
-   GETMODAPKS STYLE - DARK GREEN THEME
+   MODSCOM - WHITE THEME
    ============================================================ */
 * {
     margin: 0;
@@ -8,17 +8,17 @@
 }
 
 :root {
-    --primary: #0d2818;
-    --secondary: #1a3a2a;
-    --accent: #4caf50;
-    --accent-hover: #388e3c;
-    --bg: #0d1f14;
-    --card-bg: #1a2e22;
-    --card-hover: #244030;
-    --text: #ffffff;
-    --text-muted: #8aaa8a;
-    --border: #2d4a35;
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --primary: #ffffff;
+    --secondary: #f8f9fa;
+    --accent: #2ea043;
+    --accent-hover: #238636;
+    --bg: #ffffff;
+    --card-bg: #ffffff;
+    --card-hover: #f0f0f0;
+    --text: #000000;
+    --text-muted: #555555;
+    --border: #e0e0e0;
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
     --radius: 10px;
 }
 
@@ -31,7 +31,7 @@ body {
 
 a {
     text-decoration: none;
-    color: inherit;
+    color: var(--text);
 }
 
 .container {
@@ -62,13 +62,13 @@ a {
    HEADER
    ============================================================ */
 header {
-    background: var(--primary);
+    background: var(--secondary);
     border-bottom: 2px solid var(--accent);
     padding: 14px 0;
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
 }
 
 header .container {
@@ -85,6 +85,12 @@ header .container {
     gap: 10px;
 }
 
+.logo img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
 .logo i {
     font-size: 2rem;
     color: var(--accent);
@@ -94,6 +100,7 @@ header .container {
     font-size: 1.6rem;
     font-weight: 800;
     letter-spacing: -0.5px;
+    color: var(--text);
 }
 
 .logo h1 span {
@@ -120,8 +127,8 @@ header .container {
     padding: 10px 18px;
     border: none;
     border-radius: 30px;
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
+    background: #f0f0f0;
+    color: var(--text);
     outline: 2px solid transparent;
     transition: 0.3s;
     min-width: 220px;
@@ -135,7 +142,7 @@ header .container {
 
 .header-search input:focus {
     outline-color: var(--accent);
-    background: rgba(255, 255, 255, 0.12);
+    background: #ffffff;
 }
 
 .header-search .search-btn {
@@ -162,7 +169,7 @@ header .container {
     font-size: 0.65rem;
     color: #22c55e;
     font-weight: 600;
-    background: rgba(34, 197, 94, 0.15);
+    background: rgba(34, 197, 94, 0.1);
     padding: 3px 12px;
     border-radius: 30px;
     border: 1px solid rgba(34, 197, 94, 0.3);
@@ -255,7 +262,7 @@ header .container {
    STATS BAR - ADMIN ONLY
    ============================================================ */
 .stats-bar {
-    background: var(--card-bg);
+    background: var(--secondary);
     padding: 10px 0;
     border-bottom: 1px solid var(--border);
 }
@@ -276,11 +283,11 @@ header .container {
     color: var(--accent);
 }
 .stats-bar .stat-item strong {
-    color: #fff;
+    color: var(--text);
 }
 
 /* ============================================================
-   APK GRID - GETMODAPKS STYLE
+   APK GRID
    ============================================================ */
 .section-title {
     margin: 30px 0 16px;
@@ -292,6 +299,7 @@ header .container {
     display: flex;
     align-items: center;
     gap: 10px;
+    color: var(--text);
 }
 
 .section-title h2 i {
@@ -322,12 +330,13 @@ header .container {
     display: flex;
     gap: 12px;
     align-items: center;
+    box-shadow: var(--shadow);
 }
 
 .apk-card:hover {
     transform: translateY(-4px);
     border-color: var(--accent);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
     background: var(--card-hover);
 }
 
@@ -335,7 +344,7 @@ header .container {
     width: 56px;
     height: 56px;
     border-radius: 12px;
-    background: var(--bg);
+    background: var(--secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -368,6 +377,7 @@ header .container {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: var(--text);
 }
 
 .apk-info .meta {
@@ -379,7 +389,7 @@ header .container {
 }
 
 .apk-info .meta span {
-    background: rgba(255, 255, 255, 0.06);
+    background: #f0f0f0;
     padding: 2px 10px;
     border-radius: 30px;
 }
@@ -395,7 +405,7 @@ header .container {
 }
 
 /* ============================================================
-   DETAIL PAGE - GETMODAPKS STYLE
+   DETAIL PAGE
    ============================================================ */
 #detailPage {
     padding: 0 0 40px;
@@ -470,6 +480,7 @@ header .container {
     font-size: 1.5rem;
     font-weight: 800;
     margin-bottom: 4px;
+    color: var(--text);
 }
 
 .detail-card .detail-title-section .detail-published {
@@ -492,7 +503,7 @@ header .container {
 .detail-card .detail-title-section .detail-tags span {
     font-size: 0.7rem;
     padding: 2px 12px;
-    background: var(--bg);
+    background: #f0f0f0;
     border-radius: 30px;
     border: 1px solid var(--border);
     color: var(--text-muted);
@@ -516,9 +527,8 @@ header .container {
     color: var(--accent);
 }
 
-/* Table of Contents */
 .detail-toc {
-    background: var(--bg);
+    background: var(--secondary);
     padding: 16px 20px;
     border-radius: 10px;
     border: 1px solid var(--border);
@@ -549,7 +559,6 @@ header .container {
     color: var(--accent);
 }
 
-/* Detail Description */
 .detail-description {
     margin-bottom: 24px;
 }
@@ -567,16 +576,15 @@ header .container {
 .detail-description p {
     font-size: 0.95rem;
     line-height: 1.8;
-    color: #c8d6e5;
+    color: var(--text);
     padding: 16px 20px;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--secondary);
     border-radius: 10px;
     border-left: 3px solid var(--accent);
 }
 
-/* App Info Table */
 .app-info-table {
-    background: var(--bg);
+    background: var(--secondary);
     border-radius: 10px;
     border: 1px solid var(--border);
     overflow: hidden;
@@ -601,14 +609,13 @@ header .container {
 }
 
 .app-info-table td:last-child {
-    color: #fff;
+    color: var(--text);
 }
 
 .app-info-table tr:last-child td {
     border-bottom: none;
 }
 
-/* Download Section */
 .detail-download {
     text-align: center;
     margin: 20px 0 16px;
@@ -632,7 +639,7 @@ header .container {
 .detail-download .btn-download-main:hover {
     background: var(--accent-hover);
     transform: scale(1.03);
-    box-shadow: 0 4px 20px rgba(76, 175, 80, 0.4);
+    box-shadow: 0 4px 20px rgba(46, 160, 67, 0.4);
 }
 
 .detail-download .btn-download-main .size-tag {
@@ -687,6 +694,7 @@ header .container {
     display: flex;
     align-items: center;
     gap: 10px;
+    color: var(--text);
 }
 
 .comments-header h4 i {
@@ -696,7 +704,7 @@ header .container {
 .live-badge {
     font-size: 0.65rem;
     color: #22c55e;
-    background: rgba(34, 197, 94, 0.15);
+    background: rgba(34, 197, 94, 0.1);
     padding: 2px 12px;
     border-radius: 30px;
     border: 1px solid rgba(34, 197, 94, 0.2);
@@ -709,7 +717,7 @@ header .container {
 }
 
 .comment-item {
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--secondary);
     padding: 10px 14px;
     border-radius: 10px;
     margin-bottom: 8px;
@@ -729,6 +737,7 @@ header .container {
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
+    color: var(--text);
 }
 
 .comment-item .comment-user i {
@@ -743,7 +752,7 @@ header .container {
 
 .comment-item .comment-text {
     font-size: 0.85rem;
-    color: #c8d6e5;
+    color: var(--text);
     margin-top: 3px;
 }
 
@@ -760,8 +769,8 @@ header .container {
     border: 1px solid var(--border);
     border-radius: 10px;
     font-size: 0.85rem;
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+    background: var(--bg);
+    color: var(--text);
     transition: 0.3s;
 }
 
@@ -772,7 +781,7 @@ header .container {
 .comment-input-group input:focus {
     outline: none;
     border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(46, 160, 67, 0.1);
 }
 
 .comment-input-group .btn-comment {
@@ -820,6 +829,7 @@ header .container {
     display: flex;
     align-items: center;
     gap: 8px;
+    color: var(--text);
 }
 
 .about-col h4 i {
@@ -916,6 +926,7 @@ header .container {
     display: flex;
     align-items: center;
     gap: 10px;
+    color: var(--text);
 }
 
 .admin-header h2 i {
@@ -930,7 +941,7 @@ header .container {
 }
 
 .admin-dash-card {
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--secondary);
     padding: 12px;
     border-radius: 10px;
     border: 1px solid var(--border);
@@ -975,8 +986,8 @@ header .container {
     font-family: inherit;
     font-size: 0.9rem;
     transition: 0.3s;
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+    background: var(--bg);
+    color: var(--text);
 }
 
 .form-group input::placeholder,
@@ -989,7 +1000,7 @@ header .container {
 .form-group textarea:focus {
     outline: none;
     border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(46, 160, 67, 0.1);
 }
 
 .form-group input[type="file"] {
@@ -1065,8 +1076,8 @@ header .container {
     color: var(--text-muted);
 }
 .btn-outline:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+    background: var(--secondary);
+    color: var(--text);
 }
 
 /* ============================================================
@@ -1079,7 +1090,7 @@ header .container {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.92);
+    background: rgba(0, 0, 0, 0.8);
     z-index: 9999;
     align-items: center;
     justify-content: center;
@@ -1111,6 +1122,7 @@ header .container {
 .admin-login-box h2 {
     font-size: 1.4rem;
     font-weight: 800;
+    color: var(--text);
 }
 
 .admin-login-box p {
@@ -1127,8 +1139,8 @@ header .container {
     font-size: 0.95rem;
     margin-bottom: 14px;
     transition: 0.3s;
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+    background: var(--bg);
+    color: var(--text);
 }
 
 .admin-login-box input:focus {
@@ -1169,14 +1181,14 @@ header .container {
 .empty-state h3 {
     font-size: 1.2rem;
     margin-bottom: 4px;
-    color: #fff;
+    color: var(--text);
 }
 
 /* ============================================================
    FOOTER
    ============================================================ */
 footer {
-    background: var(--primary);
+    background: var(--secondary);
     color: var(--text-muted);
     padding: 30px 0;
     border-top: 2px solid var(--accent);
