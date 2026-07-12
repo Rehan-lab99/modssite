@@ -4,55 +4,175 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
-const mongoose = require('mongoose');
+const { Pool } = require('pg');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ============================================================
-//  MONGODB CONNECTION
+//  POSTGRESQL CONNECTION
 // ============================================================
-// YAHAN APNA MONGODB CONNECTION STRING DAALEIN
-const MONGODB_URI = 'mongodb+srv://mdrehanshaikh913620_db_user:<db_password>@cluster0.tqtiw9l.mongodb.net/?appName=Cluster0';
-
-mongoose.connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', () => {
-    console.log('✅ Connected to MongoDB Atlas - Data is PERMANENT!');
+// Test connection
+pool.connect((err, client, release) => {
+    if (err) {
+        console.error('❌ PostgreSQL connection error:', err.stack);
+    } else {
+        console.log('✅ Connected to PostgreSQL - Data is PERMANENT!');
+        release();
+        initDatabase();
+    }
 });
 
 // ============================================================
-//  MONGOOSE SCHEMA
+//  CREATE TABLES
 // ============================================================
-const commentSchema = new mongoose.Schema({
-    user: String,
-    text: String,
-    time: Number
-});
+async function initDatabase() {
+    try {
+        // APKs table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS apks (
+                id TEXT PRIMARY KEY,
+                title TEXT NOT NULL,
+                category TEXT,
+                version TEXT,
+                size TEXT,
+                android TEXT,
+                developer TEXT,
+                modinfo TEXT,
+                description TEXT,
+                icon TEXT,
+                downloadlink TEXT,
+                views INTEGER DEFAULT 0,
+                downloads INTEGER DEFAULT 0,
+                viewedSessions TEXT[],
+                createdat BIGINT
+            )
+        `);
 
-const apkSchema = new mongoose.Schema({
-    id: { type: String, unique: true },
-    title: String,
-    category: String,
-    version: String,
-    size: String,
-    android: String,
-    description: String,
-    icon: String,
-    downloadLink: String,
-    views: Number,
-    downloads: Number,
-    comments: [commentSchema],
-    viewedSessions: [String],
-    createdAt: Number
-});
+        // Comments table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS comments (
+                id SERIAL PRIMARY KEY,
+                apk_id TEXT REFERENCES apks(id) ON DELETE CASCADE,
+                user_name TEXT,
+                comment_text TEXT,
+                comment_time BIGINT
+            )
+        `);
 
-const APK = mongoose.model('APK', apkSchema);
+        console.log('📦 Database tables ready');
+        
+        // Insert sample data if empty
+        const result = await pool.query('SELECT COUNT(*) FROM apks');
+        if (parseInt(result.rows[0].count) === 0) {
+            await insertSampleData();
+        }
+    } catch (error) {
+        console.error('Database init error:', error);
+    }
+}
+
+// ============================================================
+//  SAMPLE DATA
+// ============================================================
+async function insertSampleData() {
+    try {
+        const samples = [
+            {
+                id: '1',
+                title: 'CapCut Pro v18.5.0 (Premium Unlocked)',
+                category: 'video-players',
+                version: '18.5.0',
+                size: '280 MB',
+                android: '5.0+',
+                developer: 'Bytedance',
+                modinfo: 'Premium Unlocked',
+                description: 'CapCut Pro Premium Unlocked has become a go-to choice for people who create videos directly from their phones...',
+                icon: '',
+                downloadlink: 'https://example.com/capcut-pro.apk',
+                views: 2847,
+                downloads: 1253,
+                viewedSessions: [],
+                createdat: Date.now() - 86400000
+            },
+            {
+                id: '2',
+                title: 'Download Diskwala Premium',
+                category: 'apps',
+                version: '2.5.0',
+                size: '45 MB',
+                android: '5.0+',
+                developer: 'Diskwala',
+                modinfo: 'Premium Unlocked',
+                description: 'Diskwala is a powerful download manager that supports multiple downloads...',
+                icon: '',
+                downloadlink: 'https://example.com/diskwala-premium.apk',
+                views: 1953,
+                downloads: 876,
+                viewedSessions: [],
+                createdat: Date.now() - 172800000
+            },
+            {
+                id: '3',
+                title: 'Graph Messenger v12.8.1.1 (Premium)',
+                category: 'communication',
+                version: '12.8.1.1',
+                size: '62 MB',
+                android: '5.0+',
+                developer: 'Graph Team',
+                modinfo: 'Premium Unlocked',
+                description: 'Graph Messenger is a feature-rich messaging app with advanced privacy features...',
+                icon: '',
+                downloadlink: 'https://example.com/graph-messenger.apk',
+                views: 1421,
+                downloads: 543,
+                viewedSessions: [],
+                createdat: Date.now() - 259200000
+            },
+            {
+                id: '4',
+                title: 'Bobble AI Keyboard v10.7.1 (Premium)',
+                category: 'personalization',
+                version: '10.7.1',
+                size: '38 MB',
+                android: '5.0+',
+                developer: 'Bobble AI',
+                modinfo: 'Premium Unlocked',
+                description: 'Bobble AI Keyboard is an intelligent keyboard with AI-powered suggestions...',
+                icon: '',
+                downloadlink: 'https://example.com/bobble-keyboard.apk',
+                views: 876,
+                downloads: 412,
+                viewedSessions: [],
+                createdat: Date.now() - 345600000
+            }
+        ];
+
+        for (const apk of samples) {
+            await pool.query(`
+                INSERT INTO apks (
+                    id, title, category, version, size, android, 
+                    developer, modinfo, description, icon, downloadlink, 
+                    views, downloads, viewedSessions, createdat
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+            `, [
+                apk.id, apk.title, apk.category, apk.version, apk.size, apk.android,
+                apk.developer, apk.modinfo, apk.description, apk.icon, apk.downloadlink,
+                apk.views, apk.downloads, apk.viewedSessions, apk.createdat
+            ]);
+        }
+        console.log('📦 Sample data inserted into PostgreSQL');
+    } catch (error) {
+        console.error('Sample data error:', error);
+    }
+}
 
 // ============================================================
 //  MIDDLEWARE
@@ -95,66 +215,24 @@ const upload = multer({
 });
 
 // ============================================================
-//  INIT SAMPLE DATA (ONLY IF EMPTY)
-// ============================================================
-async function initSampleData() {
-    const count = await APK.countDocuments();
-    if (count === 0) {
-        const samples = [
-            {
-                id: '1',
-                title: 'Spotify Premium Mod',
-                category: 'music-audio',
-                version: '8.9.18.512',
-                size: '72.5 MB',
-                android: '5.0+',
-                description: 'Spotify Premium Mod APK - Unlimited skips, no ads, offline downloads, and all premium features unlocked.',
-                icon: '',
-                downloadLink: 'https://example.com/spotify-premium-mod.apk',
-                views: 2847,
-                downloads: 1253,
-                comments: [
-                    { user: 'Rahul', text: 'Working perfectly! Thanks 🔥', time: Date.now() - 3600000 },
-                    { user: 'Priya', text: 'No ads, amazing app! 💯', time: Date.now() - 7200000 }
-                ],
-                viewedSessions: [],
-                createdAt: Date.now()
-            },
-            {
-                id: '2',
-                title: 'Minecraft Premium',
-                category: 'games',
-                version: '1.20.81.01',
-                size: '185.3 MB',
-                android: '5.0+',
-                description: 'Minecraft Premium APK - Full unlocked game with all features. Build, explore, and survive.',
-                icon: '',
-                downloadLink: 'https://example.com/minecraft-premium.apk',
-                views: 1953,
-                downloads: 876,
-                comments: [
-                    { user: 'Amit', text: 'Best game ever! 🎮', time: Date.now() - 1800000 }
-                ],
-                viewedSessions: [],
-                createdAt: Date.now()
-            }
-        ];
-        await APK.insertMany(samples);
-        console.log('📦 Sample data inserted into MongoDB');
-    }
-}
-initSampleData();
-
-// ============================================================
 //  API ENDPOINTS
 // ============================================================
 
 // Get all APKs
 app.get('/api/apks', async (req, res) => {
     try {
-        const apks = await APK.find().sort({ createdAt: -1 });
-        res.json(apks);
+        const result = await pool.query(`
+            SELECT a.*, 
+                   COALESCE(json_agg(json_build_object('user', c.user_name, 'text', c.comment_text, 'time', c.comment_time)) 
+                   FILTER (WHERE c.id IS NOT NULL), '[]') as comments
+            FROM apks a
+            LEFT JOIN comments c ON a.id = c.apk_id
+            GROUP BY a.id
+            ORDER BY a.createdat DESC
+        `);
+        res.json(result.rows);
     } catch (error) {
+        console.error('Error fetching APKs:', error);
         res.status(500).json({ error: 'Failed to fetch APKs' });
     }
 });
@@ -162,10 +240,22 @@ app.get('/api/apks', async (req, res) => {
 // Get single APK
 app.get('/api/apks/:id', async (req, res) => {
     try {
-        const apk = await APK.findOne({ id: req.params.id });
-        if (!apk) return res.status(404).json({ error: 'APK not found' });
-        res.json(apk);
+        const result = await pool.query(`
+            SELECT a.*, 
+                   COALESCE(json_agg(json_build_object('user', c.user_name, 'text', c.comment_text, 'time', c.comment_time)) 
+                   FILTER (WHERE c.id IS NOT NULL), '[]') as comments
+            FROM apks a
+            LEFT JOIN comments c ON a.id = c.apk_id
+            WHERE a.id = $1
+            GROUP BY a.id
+        `, [req.params.id]);
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'APK not found' });
+        }
+        res.json(result.rows[0]);
     } catch (error) {
+        console.error('Error fetching APK:', error);
         res.status(500).json({ error: 'Failed to fetch APK' });
     }
 });
@@ -173,62 +263,47 @@ app.get('/api/apks/:id', async (req, res) => {
 // Add/Update APK
 app.post('/api/apks', upload.fields([{ name: 'icon', maxCount: 1 }]), async (req, res) => {
     try {
-        const { id, title, category, version, size, android, description, downloadLink, iconData } = req.body;
+        const { id, title, category, version, size, android, developer, description, downloadLink, iconData } = req.body;
 
         let iconUrl = '';
         if (req.files && req.files.icon && req.files.icon[0]) {
             iconUrl = '/uploads/' + req.files.icon[0].filename;
         } else if (iconData && iconData.startsWith('data:image')) {
             iconUrl = iconData;
-        } else if (iconData) {
-            iconUrl = iconData;
         }
 
         if (id && id !== '') {
-            // UPDATE
-            const existing = await APK.findOne({ id: id });
-            if (!existing) return res.status(404).json({ error: 'APK not found' });
-
-            // Preserve views, downloads, comments, viewedSessions
-            const updateData = {
-                title: title,
-                category: category,
-                version: version || '1.0',
-                size: size || '10 MB',
-                android: android || '5.0+',
-                description: description || '',
-                downloadLink: downloadLink || '',
-                icon: iconUrl || existing.icon,
-                views: existing.views || 0,
-                downloads: existing.downloads || 0,
-                comments: existing.comments || [],
-                viewedSessions: existing.viewedSessions || [],
-                createdAt: existing.createdAt || Date.now()
-            };
-
-            await APK.updateOne({ id: id }, updateData);
-            const updated = await APK.findOne({ id: id });
-            res.json({ success: true, apk: updated });
+            // UPDATE - Preserve existing views, downloads, comments
+            const existing = await pool.query('SELECT views, downloads, viewedSessions FROM apks WHERE id = $1', [id]);
+            if (existing.rows.length === 0) {
+                return res.status(404).json({ error: 'APK not found' });
+            }
+            
+            await pool.query(`
+                UPDATE apks SET 
+                    title = $1, category = $2, version = $3, size = $4, 
+                    android = $5, developer = $6, description = $7, icon = $8, downloadlink = $9
+                WHERE id = $10
+            `, [title, category || 'apps', version || '1.0', size || '10 MB', 
+                android || '5.0+', developer || 'Unknown', description || '', iconUrl, downloadLink || '', id]);
+            
+            const result = await pool.query('SELECT * FROM apks WHERE id = $1', [id]);
+            res.json({ success: true, apk: result.rows[0] });
         } else {
             // ADD NEW
-            const newApk = new APK({
-                id: uuidv4(),
-                title: title,
-                category: category,
-                version: version || '1.0',
-                size: size || '10 MB',
-                android: android || '5.0+',
-                description: description || '',
-                downloadLink: downloadLink || '',
-                icon: iconUrl,
-                views: 0,
-                downloads: 0,
-                comments: [],
-                viewedSessions: [],
-                createdAt: Date.now()
-            });
-            await newApk.save();
-            res.json({ success: true, apk: newApk });
+            const newId = uuidv4();
+            await pool.query(`
+                INSERT INTO apks (
+                    id, title, category, version, size, android, 
+                    developer, modinfo, description, icon, downloadlink, 
+                    views, downloads, viewedSessions, createdat
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+            `, [newId, title, category || 'apps', version || '1.0', size || '10 MB', 
+                android || '5.0+', developer || 'Unknown', 'Premium Unlocked', 
+                description || '', iconUrl, downloadLink || '', 0, 0, [], Date.now()]);
+            
+            const result = await pool.query('SELECT * FROM apks WHERE id = $1', [newId]);
+            res.json({ success: true, apk: result.rows[0] });
         }
     } catch (error) {
         console.error('Error saving APK:', error);
@@ -239,12 +314,13 @@ app.post('/api/apks', upload.fields([{ name: 'icon', maxCount: 1 }]), async (req
 // Delete APK
 app.delete('/api/apks/:id', async (req, res) => {
     try {
-        const result = await APK.deleteOne({ id: req.params.id });
-        if (result.deletedCount === 0) {
+        const result = await pool.query('DELETE FROM apks WHERE id = $1', [req.params.id]);
+        if (result.rowCount === 0) {
             return res.status(404).json({ error: 'APK not found' });
         }
         res.json({ success: true });
     } catch (error) {
+        console.error('Error deleting APK:', error);
         res.status(500).json({ error: 'Failed to delete APK' });
     }
 });
@@ -252,20 +328,29 @@ app.delete('/api/apks/:id', async (req, res) => {
 // Track view
 app.post('/api/apks/:id/view', async (req, res) => {
     try {
-        const apk = await APK.findOne({ id: req.params.id });
-        if (!apk) return res.status(404).json({ error: 'APK not found' });
-
         const { sessionId } = req.body;
-        if (!apk.viewedSessions) apk.viewedSessions = [];
-
-        if (!apk.viewedSessions.includes(sessionId)) {
-            apk.viewedSessions.push(sessionId);
-            apk.views = (apk.views || 0) + 1;
-            await apk.save();
+        
+        const result = await pool.query(
+            'SELECT viewedSessions FROM apks WHERE id = $1',
+            [req.params.id]
+        );
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'APK not found' });
         }
-
-        res.json({ success: true, views: apk.views });
+        
+        const viewedSessions = result.rows[0].viewedsessions || [];
+        if (!viewedSessions.includes(sessionId)) {
+            viewedSessions.push(sessionId);
+            await pool.query(
+                'UPDATE apks SET views = views + 1, viewedSessions = $1 WHERE id = $2',
+                [viewedSessions, req.params.id]
+            );
+        }
+        
+        res.json({ success: true });
     } catch (error) {
+        console.error('Error tracking view:', error);
         res.status(500).json({ error: 'Failed to track view' });
     }
 });
@@ -273,14 +358,13 @@ app.post('/api/apks/:id/view', async (req, res) => {
 // Track download
 app.post('/api/apks/:id/download', async (req, res) => {
     try {
-        const apk = await APK.findOne({ id: req.params.id });
-        if (!apk) return res.status(404).json({ error: 'APK not found' });
-
-        apk.downloads = (apk.downloads || 0) + 1;
-        await apk.save();
-
-        res.json({ success: true, downloads: apk.downloads });
+        await pool.query(
+            'UPDATE apks SET downloads = downloads + 1 WHERE id = $1',
+            [req.params.id]
+        );
+        res.json({ success: true });
     } catch (error) {
+        console.error('Error tracking download:', error);
         res.status(500).json({ error: 'Failed to track download' });
     }
 });
@@ -288,24 +372,19 @@ app.post('/api/apks/:id/download', async (req, res) => {
 // Add comment
 app.post('/api/apks/:id/comment', async (req, res) => {
     try {
-        const apk = await APK.findOne({ id: req.params.id });
-        if (!apk) return res.status(404).json({ error: 'APK not found' });
-
         const { user, text } = req.body;
         if (!text || text.trim() === '') {
             return res.status(400).json({ error: 'Comment cannot be empty' });
         }
 
-        if (!apk.comments) apk.comments = [];
-        apk.comments.push({
-            user: user || 'User',
-            text: text.trim(),
-            time: Date.now()
-        });
-        await apk.save();
-
-        res.json({ success: true, comments: apk.comments });
+        await pool.query(
+            'INSERT INTO comments (apk_id, user_name, comment_text, comment_time) VALUES ($1, $2, $3, $4)',
+            [req.params.id, user || 'User', text.trim(), Date.now()]
+        );
+        
+        res.json({ success: true });
     } catch (error) {
+        console.error('Error adding comment:', error);
         res.status(500).json({ error: 'Failed to add comment' });
     }
 });
@@ -313,29 +392,23 @@ app.post('/api/apks/:id/comment', async (req, res) => {
 // Get stats
 app.get('/api/stats', async (req, res) => {
     try {
-        const apks = await APK.find();
-        let totalViews = 0;
-        let totalDownloads = 0;
-        let totalComments = 0;
-        const sessions = new Set();
-
-        apks.forEach(a => {
-            totalViews += (a.views || 0);
-            totalDownloads += (a.downloads || 0);
-            totalComments += (a.comments || []).length;
-            if (a.viewedSessions) {
-                a.viewedSessions.forEach(s => sessions.add(s));
-            }
-        });
-
+        const result = await pool.query(`
+            SELECT 
+                COUNT(*) as totalApks,
+                COALESCE(SUM(views), 0) as totalViews,
+                COALESCE(SUM(downloads), 0) as totalDownloads,
+                (SELECT COUNT(*) FROM comments) as totalComments
+            FROM apks
+        `);
         res.json({
-            totalApks: apks.length,
-            totalViews: totalViews,
-            totalDownloads: totalDownloads,
-            totalComments: totalComments,
-            activeUsers: sessions.size
+            totalApks: parseInt(result.rows[0].totalapks),
+            totalViews: parseInt(result.rows[0].totalviews),
+            totalDownloads: parseInt(result.rows[0].totaldownloads),
+            totalComments: parseInt(result.rows[0].totalcomments),
+            activeUsers: 0
         });
     } catch (error) {
+        console.error('Error getting stats:', error);
         res.status(500).json({ error: 'Failed to get stats' });
     }
 });
@@ -343,14 +416,16 @@ app.get('/api/stats', async (req, res) => {
 // Get categories
 app.get('/api/categories', async (req, res) => {
     try {
-        const apks = await APK.find();
+        const result = await pool.query(
+            'SELECT category, COUNT(*) as count FROM apks GROUP BY category'
+        );
         const categories = {};
-        apks.forEach(a => {
-            const cat = a.category || 'apps';
-            categories[cat] = (categories[cat] || 0) + 1;
+        result.rows.forEach(row => {
+            categories[row.category] = parseInt(row.count);
         });
         res.json(categories);
     } catch (error) {
+        console.error('Error getting categories:', error);
         res.status(500).json({ error: 'Failed to get categories' });
     }
 });
@@ -373,7 +448,7 @@ app.listen(PORT, () => {
     ║                                                          ║
     ║   🌐 http://localhost:${PORT}                             ║
     ║                                                          ║
-    ║   🗄️  MongoDB Atlas Connected - DATA IS PERMANENT!      ║
+    ║   🗄️  PostgreSQL Connected - DATA IS PERMANENT!         ║
     ║                                                          ║
     ║   🔑 Admin Access: http://localhost:${PORT}#x7K9mP2qL4nR8 ║
     ║                                                          ║
