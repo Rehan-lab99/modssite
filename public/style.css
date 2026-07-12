@@ -190,9 +190,7 @@ header .container {
     background: var(--secondary);
     padding: 12px 0;
     border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 74px;
-    z-index: 90;
+    
 }
 
 .top-nav .container {
