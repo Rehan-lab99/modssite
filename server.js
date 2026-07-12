@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 //  MONGODB CONNECTION
 // ============================================================
 // YAHAN APNA MONGODB CONNECTION STRING DAALEIN
-const MONGODB_URI = 'mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@cluster0.xxxxx.mongodb.net/modscom?retryWrites=true&w=majority';
+const MONGODB_URI = 'mongodb+srv://mdrehanshaikh913620_db_user:<db_password>@cluster0.tqtiw9l.mongodb.net/?appName=Cluster0';
 
 mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true,
