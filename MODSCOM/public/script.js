@@ -139,7 +139,7 @@ async function getStats() {
 //  TELEGRAM FUNCTION
 // ============================================================
 function openTelegram() {
-    window.open('https://t.me/modsowner_bot', '_blank');
+    window.open('https://t.me/modscom18', '_blank');
 }
 
 // ============================================================
@@ -148,7 +148,6 @@ function openTelegram() {
 function filterCategory(category) {
     currentCategory = category;
     render();
-    // Scroll to results
     document.querySelector('.section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -539,9 +538,10 @@ window.openTelegram = openTelegram;
 // ============================================================
 loadAPKs();
 
-console.log('📱 GETMODAPKS - Style Loaded');
+console.log('📱 MODSCOM - White Theme Loaded');
 console.log('🔑 Admin Password: ' + ADMIN_PASSWORD);
 console.log('🔐 Secret URL: Add #' + SECRET_KEY + ' to the URL');
 console.log('📌 Example: ' + window.location.href.split('#')[0] + '#' + SECRET_KEY);
 console.log('📂 Categories: Apps, Games, Mods, Tools');
+console.log('📱 Telegram: @modscom18');
 console.log('🔄 Auto-sync every 5 seconds');
