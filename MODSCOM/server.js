@@ -35,7 +35,6 @@ pool.connect((err, client, release) => {
 // ============================================================
 async function initDatabase() {
     try {
-        // APKs table
         await pool.query(`
             CREATE TABLE IF NOT EXISTS apks (
                 id TEXT PRIMARY KEY,
@@ -56,7 +55,6 @@ async function initDatabase() {
             )
         `);
 
-        // Comments table
         await pool.query(`
             CREATE TABLE IF NOT EXISTS comments (
                 id SERIAL PRIMARY KEY,
@@ -69,7 +67,6 @@ async function initDatabase() {
 
         console.log('📦 Database tables ready');
         
-        // Insert sample data if empty
         const result = await pool.query('SELECT COUNT(*) FROM apks');
         if (parseInt(result.rows[0].count) === 0) {
             await insertSampleData();
@@ -273,7 +270,6 @@ app.post('/api/apks', upload.fields([{ name: 'icon', maxCount: 1 }]), async (req
         }
 
         if (id && id !== '') {
-            // UPDATE - Preserve existing views, downloads, comments
             const existing = await pool.query('SELECT views, downloads, viewedSessions FROM apks WHERE id = $1', [id]);
             if (existing.rows.length === 0) {
                 return res.status(404).json({ error: 'APK not found' });
@@ -290,7 +286,6 @@ app.post('/api/apks', upload.fields([{ name: 'icon', maxCount: 1 }]), async (req
             const result = await pool.query('SELECT * FROM apks WHERE id = $1', [id]);
             res.json({ success: true, apk: result.rows[0] });
         } else {
-            // ADD NEW
             const newId = uuidv4();
             await pool.query(`
                 INSERT INTO apks (
@@ -444,7 +439,7 @@ app.listen(PORT, () => {
     console.log(`
     ╔══════════════════════════════════════════════════════════╗
     ║                                                          ║
-    ║   📱 ModsCom Server Started!                            ║
+    ║   📱 MODSCOM Server Started!                            ║
     ║                                                          ║
     ║   🌐 http://localhost:${PORT}                             ║
     ║                                                          ║
